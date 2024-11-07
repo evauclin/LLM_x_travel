@@ -1,6 +1,4 @@
-import requests
-
-import
+from ticket_master import request_ticket_master
 
 
 if __name__ == "__main__":
