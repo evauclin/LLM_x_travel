@@ -1,4 +1,4 @@
-from model import FormProcessor
+from model import FormProcessor, extract_parameters
 from ticket_master import request_ticket_master
 
 
@@ -18,19 +18,25 @@ if __name__ == "__main__":
         if query.lower() == 'quit':
             break
 
-        print("\nGénération des paramètres...")
+        print("\nTruncation was not explicitly activated but `max_length` is provided...")
+        print("Setting `pad_token_id` to `eos_token_id`:128001 for open-end generation.\n")
+
+        print("Génération des paramètres...\n")
         response = processor.process_form(query)
-        print("\nParamètres générés:")
+        print("Paramètres générés:")
         print(response)
-        print("\n" + "=" * 50)
 
-    #response
-    params = {
-        "city": "Paris",
-        "countryCode": "FR",
-        "locale": "*",
-        "classificationName": "music",
-        "page": 0
-    }
+        # Extraire les paramètres
+        extracted_params = extract_parameters(response)
 
-    request_ticket_master(params)
+        # Créer le dictionnaire de paramètres final
+        params = {
+            "city": extracted_params["city"],
+            "countryCode": extracted_params["countryCode"],
+            "locale": "*",
+            "classificationName": extracted_params["classificationName"],
+            "page": 0
+        }
+
+        # Appeler la fonction request_ticket_master
+        request_ticket_master(params)

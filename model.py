@@ -3,9 +3,43 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, logging
 from huggingface_hub import login
 import torch
 import warnings
+import re
+
+from ticket_master import request_ticket_master
 
 warnings.filterwarnings("ignore")
 logging.set_verbosity_error()
+
+
+def extract_parameters(response_text):
+    # Trouver tous les blocs de paramètres dans le texte
+    params_matches = list(re.finditer(r'params\s*=\s*{([^}]+)}', response_text))
+
+    # Prendre le dernier bloc de paramètres (celui avec les vraies valeurs)
+    if len(params_matches) > 0:
+        param_text = params_matches[-1].group(1)
+
+        # Extraire les valeurs
+        city_match = re.search(r'"city":\s*"([^"]+)"', param_text)
+        country_match = re.search(r'"countryCode":\s*"([^"]+)"', param_text)
+        class_match = re.search(r'"classificationName":\s*"([^"]+)"', param_text)
+        page_match = re.search(r'"page":\s*"([^"]+)"', param_text)
+
+        return {
+            "city": city_match.group(1) if city_match else "",
+            "countryCode": country_match.group(1) if country_match else "",
+            "locale": "*",
+            "classificationName": class_match.group(1) if class_match else "",
+            "page": "0"
+        }
+    else:
+        return {
+            "city": "",
+            "countryCode": "",
+            "locale": "*",
+            "classificationName": "",
+            "page": "0"
+        }
 
 
 class FormProcessor:
@@ -16,9 +50,7 @@ class FormProcessor:
         print("Loading model...")
         token = "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"
         model_name_or_path = "Qwen/Qwen2.5-1.5B-Instruct"
-        model_name_or_path = "Qwen/Qwen2.5-3B-Instruct"
 
-        # Afficher le message de login
         login(token=token)
         print("\nLogin successful\n")
 
@@ -37,7 +69,6 @@ class FormProcessor:
             torch_dtype=torch.float16
         )
         print(" 2/2 [00:03<00:00,  1.40s/it]\n")
-
         print(
             'WARNING:accelerate.big_modeling:Some parameters are on the meta device because they were offloaded to the cpu.\n')
 
@@ -58,7 +89,7 @@ class FormProcessor:
         Format de sortie requis:
         params = {{
             "city": "ville extraite",
-            "countryCode": code pays extrait",
+            "countryCode": "code pays extrait",
             "locale": "*",
             "classificationName": "type d'événement extrait",
             "page": "numéro de page extrait ou 0 par défaut"
@@ -73,29 +104,3 @@ class FormProcessor:
         except Exception as e:
             return f"Erreur lors du traitement: {e}"
 
-
-def main():
-    processor = FormProcessor()
-    print("Générateur de paramètres URL initialisé! (Tapez 'quit' pour quitter)")
-    print("\nExemples de requêtes:")
-    print("- 'Je cherche des concerts à Lyon'")
-    print("- 'Événements sportifs à Marseille'")
-    print("- 'Spectacles de théâtre à Paris'")
-
-    while True:
-        query = input("\nQuelle est votre recherche ? ")
-        if query.lower() == 'quit':
-            break
-
-        print(
-            "\nTruncation was not explicitly activated but `max_length` is provided a specific value, please use `truncation=True` to explicitly truncate examples to max length. Defaulting to 'longest_first' truncation strategy. If you encode pairs of sequences (GLUE-style) with the tokenizer you can select this strategy more precisely by providing a specific strategy to `truncation`.")
-        print("Setting `pad_token_id` to `eos_token_id`:128001 for open-end generation.\n")
-
-        print("Génération des paramètres...\n")
-        response = processor.process_form(query)
-        print("Paramètres générés:")
-        print(response)
-
-
-if __name__ == "__main__":
-    main()
