@@ -29,6 +29,7 @@ def request_ticket_master(params) -> str:
                 "date": event['dates']['start']['localDate'],
                 "venue": event['_embedded']['venues'][0]['name'],
                 "description": event.get('description', "Aucune description disponible"),
+                "url": event.get("url", "Lien non disponible")  # Ajout du lien de l'événement
             }
 
             price_ranges = event.get("priceRanges")
@@ -51,6 +52,7 @@ def request_ticket_master(params) -> str:
             file.write(f"Lieu: {event['venue']}\n")
             file.write(f"Description: {event['description']}\n")
             file.write(f"Prix: {event['price']}\n")
+            file.write(f"Lien Ticketmaster: {event['url']}\n")  # Ajout du lien dans le fichier
             file.write("-" * 20 + "\n")
 
     print("Les informations des événements ont été enregistrées dans 'output.txt'.")
