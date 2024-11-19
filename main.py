@@ -19,6 +19,7 @@ if __name__ == "__main__":
 
     # Récupération des liens d'événements depuis Eventbrite
     events_links = EventBrite.get_events_links("france", "paris", "soirée")
+    events_links = list(set(events_links))
     print("Liens des événements récupérés :", events_links)
 
     # Construire une chaîne de caractères avec les détails des événements

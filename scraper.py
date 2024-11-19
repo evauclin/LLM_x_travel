@@ -48,7 +48,7 @@ class EventbriteScraper:
             await page.goto(url)
 
             # Attendre que la page se charge complètement
-            await page.wait_for_timeout(5000)  # Peut être remplacé par un wait_for_selector si besoin
+            await page.wait_for_timeout(2000)  # Peut être remplacé par un wait_for_selector si besoin
 
             # Récupérer les détails des événements
             event_details = await page.locator('.Layout-module__layout___1vM08').all_text_contents()
