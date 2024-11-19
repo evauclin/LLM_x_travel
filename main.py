@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
                 # Ajouter chaque événement au texte avec une mise en forme
                 events_text += f"Link: {link}\n"
-                for detail in event_details:
+                for detail in set(event_details):  # Supprimer les doublons éventuels des détails
                     events_text += f"{detail}\n"
                 events_text += "\n" + "=" * 40 + "\n\n"  # Séparation entre les événements
 
