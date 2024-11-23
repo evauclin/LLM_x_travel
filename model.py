@@ -41,13 +41,7 @@ class FormProcessor:
         et génère uniquement les paramètres de l'URL Ticketmaster correspondants.
 
         Format de sortie requis:
-        params = {{
-            "city": [ville extraite],
-            "countryCode": [code pays extrait],
-            "locale": "*",
-            "classificationName": [type d'événement extrait],
-            "page": [numéro de page extrait ou 0 par défaut]
-        }}
+        
 
         Ne génère que les paramètres, sans autre texte.
         """
