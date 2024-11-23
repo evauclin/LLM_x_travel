@@ -190,10 +190,12 @@ class EventSearch:
                 "category": "type d'événement ou mot-clé exemple: "theatre" ou "music""
             }
         }
+        
+        le format doit absolument être respecté pour que l'agent puisse analyser correctement la requête.
         """
 
         response = self.ollama_client.chat(
-            model='llama3.1:latest',
+            model='llama3.2-vision:latest',
             messages=[
                 {'role': 'system', 'content': system_message},
                 {'role': 'user', 'content': user_query}
