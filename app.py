@@ -6,15 +6,12 @@ import asyncio
 from event_search import EventSearch
 
 
-
 def add_background_image(image_path):
-    # Convertir l'image en base64 pour l'utiliser dans le CSS
     img = Image.open(image_path)
     buffered = BytesIO()
     img.save(buffered, format="PNG")
     img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-    # Ajouter le CSS pour l'image de fond et modifier la couleur du texte et de fond des champs de saisie
     st.markdown(
         f"""
         <style>
@@ -50,7 +47,7 @@ def add_background_image(image_path):
         }}
         </style>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
 
@@ -58,17 +55,14 @@ async def search_events(user_query):
     API_KEY = "97ViRGFgMAAjpbWjitt2p3JlLNfoMYQz"
     event_search = EventSearch(API_KEY)
 
-    # Ici, nous devons générer des paramètres à partir de la requête brute
     params = event_search.generate_params(user_query)
 
     if not params:
         return "Impossible de générer les paramètres de recherche."
 
-    # Afficher les paramètres générés
     st.write("### Paramètres de recherche générés :")
     st.json(params)
 
-    # Recherche des événements
     events = await event_search.search_events(params)
     event_search.save_events(events)
 
@@ -98,41 +92,41 @@ async def search_events(user_query):
     else:
         return "Impossible de générer des recommandations."
 
+
 # Fonction principale de l'application
 def app():
     st.set_page_config(layout="wide")
 
-    # Ajouter l'image de fond
-    add_background_image("trip.png")  # Remplace avec ton propre chemin d'image
+    add_background_image("trip.png")
 
-    # Afficher l'introduction
     st.title("Welcome to TravelBot!")
-    st.subheader("Tell me what you're looking for, and I'll find events and activities for you!")
+    st.subheader(
+        "Tell me what you're looking for, and I'll find events and activities for you!"
+    )
 
-    # Créer un champ de texte unique pour la requête de l'utilisateur
-    user_query = st.text_area('What is your travel request? (e.g., "I want to travel to Paris for theater and sightseeing between January and March 2025")', '')
+    user_query = st.text_area(
+        'What is your travel request? (e.g., "I want to travel to Paris for theater and sightseeing between January and March 2025")',
+        "",
+    )
 
-    # Si la requête est soumise
-    if st.button('Get Suggestions'):
+    if st.button("Get Suggestions"):
         if user_query:
-            # Appeler la fonction pour récupérer les suggestions (en fonction de la requête brute)
             output = asyncio.run(search_events(user_query))
 
-            # Afficher la réponse générée par TravelBot
             st.write("### Suggestions for your request:")
             st.write(output)
         else:
             st.warning("Please enter a valid query!")
 
-    # Note de bas de page
     st.write(
         "-----------\n\nThis bot uses generative AI to suggest activities and events based on your preferences. "
         "It pulls information from a variety of sources to give you personalized travel ideas!"
     )
 
     st.write(
-        '\n\n\nDisclaimer: The suggestions provided may not be exhaustive or fully accurate depending on available data.'
+        "\n\n\nDisclaimer: The suggestions provided may not be exhaustive or fully accurate depending on available data."
     )
+
 
 if __name__ == "__main__":
     app()

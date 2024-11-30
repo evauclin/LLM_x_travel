@@ -15,16 +15,14 @@ class FormProcessor:
 
         login(token=token)
         tokenizer = AutoTokenizer.from_pretrained(
-            model_name_or_path,
-            token=token,
-            use_fast=True
+            model_name_or_path, token=token, use_fast=True
         )
         model = AutoModelForCausalLM.from_pretrained(
             model_name_or_path,
             token=token,
             device_map="auto",
             trust_remote_code=True,
-            torch_dtype=torch.float16
+            torch_dtype=torch.float16,
         )
 
         pipe = pipeline(
@@ -32,7 +30,7 @@ class FormProcessor:
             model=model,
             tokenizer=tokenizer,
             max_length=256,  # Réduit car nous avons besoin d'une réponse plus courte
-            temperature=0.05  # Réduit pour des réponses plus précises
+            temperature=0.05,  # Réduit pour des réponses plus précises
         )
         return HuggingFacePipeline(pipeline=pipe)
 
@@ -64,7 +62,7 @@ def main():
 
     while True:
         query = input("\nQuelle est votre recherche ? ")
-        if query.lower() == 'quit':
+        if query.lower() == "quit":
             break
 
         print("\nGénération des paramètres...")

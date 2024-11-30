@@ -20,14 +20,10 @@ class TicketmasterClient:
                     **params,
                     "apikey": self.api_key,
                     "page": str(current_page),
-                    "size": "20"
+                    "size": "20",
                 }
 
-                response = requests.get(
-                    self.base_url,
-                    params=search_params,
-                    timeout=30
-                )
+                response = requests.get(self.base_url, params=search_params, timeout=30)
                 response.raise_for_status()
 
                 data = response.json()
@@ -53,12 +49,14 @@ class TicketmasterClient:
         """Parse a single event into a structured format"""
         try:
             event_info = {
-                "name": event['name'],
-                "date": event['dates']['start']['localDate'],
-                "venue": event['_embedded']['venues'][0]['name'],
-                "description": event.get('description', "Aucune description disponible"),
+                "name": event["name"],
+                "date": event["dates"]["start"]["localDate"],
+                "venue": event["_embedded"]["venues"][0]["name"],
+                "description": event.get(
+                    "description", "Aucune description disponible"
+                ),
                 "price": "Informations non disponibles",
-                "url": event.get('url', "Lien non disponible")
+                "url": event.get("url", "Lien non disponible"),
             }
 
             if price_ranges := event.get("priceRanges"):

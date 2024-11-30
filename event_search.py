@@ -41,19 +41,19 @@ class EventSearch:
         """
 
         response = self.ollama_client.chat(
-            model='llava:13b',
+            model="llava:13b",
             messages=[
-                {'role': 'system', 'content': system_message},
-                {'role': 'user', 'content': user_query}
-            ]
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": user_query},
+            ],
         )
 
         if not response:
             return None
 
-        content = response['message']['content'].strip()
-        json_start = content.find('{')
-        json_end = content.rfind('}') + 1
+        content = response["message"]["content"].strip()
+        json_start = content.find("{")
+        json_end = content.rfind("}") + 1
         return json.loads(content[json_start:json_end])
 
     async def search_events(self, params: Dict) -> Dict[str, List[Dict]]:
@@ -68,21 +68,18 @@ class EventSearch:
             events_links = self.eventbrite_scraper.get_events_links(
                 eventbrite_params["state"],
                 eventbrite_params["city"],
-                eventbrite_params["category"]
+                eventbrite_params["category"],
             )
             for link in events_links:
                 event_info = {
                     "state": eventbrite_params["state"],
                     "city": eventbrite_params["city"],
                     "category": eventbrite_params["category"],
-                    "url": link
+                    "url": link,
                 }
                 eventbrite_events.append(event_info)
 
-        return {
-            "ticketmaster": ticketmaster_events,
-            "eventbrite": eventbrite_events
-        }
+        return {"ticketmaster": ticketmaster_events, "eventbrite": eventbrite_events}
 
     def save_events(self, events: Dict[str, List[Dict]], filename: str = "output.txt"):
         """Save events to a file"""
@@ -100,7 +97,9 @@ class EventSearch:
                         file.write(f"Prix: {event['price']}\n")
                         file.write(f"URL: {event['url']}\n")
                         file.write("-" * 50 + "\n")
-                print(f"{len([e for e in events if e])} événements trouvés et enregistrés dans '{filename}'")
+                print(
+                    f"{len([e for e in events if e])} événements trouvés et enregistrés dans '{filename}'"
+                )
             else:
                 file.write("Aucun événement trouvé pour ces critères de recherche.\n")
                 print("Aucun événement trouvé.")
@@ -118,19 +117,23 @@ class EventSearch:
 
         print(f"Événements enregistrés dans '{filename}'")
 
-    def generate_response(self, user_query: str, content: str, user_message_template: str) -> Optional[str]:
+    def generate_response(
+        self, user_query: str, content: str, user_message_template: str
+    ) -> Optional[str]:
         """Generate a response based on events and user query"""
-        formatted_message = user_message_template.format(content=content, user_query=user_query)
+        formatted_message = user_message_template.format(
+            content=content, user_query=user_query
+        )
 
         response = self.ollama_client.chat(
-            model='llama3.2-vision:latest',
+            model="llama3.2-vision:latest",
             messages=[
-                {'role': 'system', 'content': self.system_message},
-                {'role': 'user', 'content': formatted_message}
+                {"role": "system", "content": self.system_message},
+                {"role": "user", "content": formatted_message},
             ],
-            stream=True
+            stream=True,
         )
 
         if response:
-            return response['message']['content']
+            return response["message"]["content"]
         return None
